@@ -2,6 +2,7 @@ package com.stream.employeemanagement.service;
 
 import com.stream.employeemanagement.mapper.EmployeeMapper;
 import com.stream.employeemanagement.pojo.Employee;
+import com.stream.employeemanagement.pojo.PagedSearchParameters;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,14 +26,14 @@ public class EmployeeService
         return employeeMapper.count();
     }
 
-    public List<Employee> getByPage(int index, int size)
+    public List<Employee> pagedSearch(PagedSearchParameters parameters)
     {
-        return employeeMapper.selectByPage(index * size, size);
+        return employeeMapper.pagedSearch(parameters);
     }
 
-    public int deleteById(int id)
+    public int deleteByIds(List<Integer> ids)
     {
-        return employeeMapper.deleteById(id);
+        return employeeMapper.deleteByIds(ids);
     }
 
     public int add(Employee employee)

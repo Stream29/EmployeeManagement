@@ -1,12 +1,17 @@
 package com.stream.employeemanagement.controller;
 
 import com.stream.employeemanagement.pojo.Employee;
-import com.stream.employeemanagement.pojo.Page;
+import com.stream.employeemanagement.pojo.PagedSearchParameters;
 import com.stream.employeemanagement.pojo.Response;
 import com.stream.employeemanagement.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -27,37 +32,40 @@ public class EmployeeController
                        .build();
     }
 
-    @GetMapping("/paged")
-    public Response getByPage(@RequestParam(defaultValue = "0") int index,
-                              @RequestParam(defaultValue = "5") int size)
+    @GetMapping("/search")
+    public Response pagedSearch(int index,
+                                int size,
+                                Integer id,
+                                String name,
+                                String sex,
+                                String phone,
+                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createTimeFrom,
+                                @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createTimeTo)
+
     {
-        log.info("GetByPage:index={},size={}", index, size);
-        return Response.builder()
-                       .success(true)
-                       .message("Get Employees By Page")
-                       .data(Page.builder()
-                                 .index(index)
-                                 .size(size)
-                                 .data(employeeService.getByPage(index, size))
-                                 .build())
-                       .build();
+        val parameters = new PagedSearchParameters(index,
+                                                   size,
+                                                   id,
+                                                   name,
+                                                   sex,
+                                                   phone,
+                                                   createTimeFrom,
+                                                   createTimeTo);
+        log.info("PagedSearch: {}", parameters);
+        return Response.success(employeeService.pagedSearch(parameters));
     }
 
-    @DeleteMapping("/{id}")
-    public Response deleteById(@PathVariable int id)
+    @DeleteMapping("/{ids}")
+    public Response deleteByIds(@PathVariable List<Integer> ids)
     {
-        log.info("DeleteById");
-        return Response.builder()
-                       .success(true)
-                       .message("Delete Employee")
-                       .data(employeeService.deleteById(id))
-                       .build();
+        log.info("DeleteByIds: {}", ids);
+        return Response.success(employeeService.deleteByIds(ids));
     }
 
     @PostMapping
     public Response add(@RequestBody Employee employee)
     {
-        log.info("AddEmployee");
+        log.info("AddEmployee: {}", employee);
         return Response.builder()
                        .success(true)
                        .message("Add Employee")
